@@ -1,0 +1,39 @@
+
+name: Build MindAR Offline Compiler
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build MindAR library
+        run: npm run build
+
+      - name: Build Offline Compiler
+        run: npx vite build --config vite.config.compiler.js
+
+      - name: Upload build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: mindar-offline-build
+          path: |
+            dist/
+            dist-compiler/
